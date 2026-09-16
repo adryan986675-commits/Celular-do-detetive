@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detetive 100</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#111827;color:#f8fafc}
+.app{max-width:900px;margin:auto;min-height:100vh;padding:18px}
+header{background:linear-gradient(135deg,#172554,#312e81);padding:22px;border-radius:20px;margin-bottom:14px}
+h1{margin:0 0 5px;font-size:32px}.sub{color:#cbd5e1}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.pill{background:#ffffff18;padding:9px 12px;border-radius:12px}
+nav{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}button{border:0;border-radius:12px;padding:11px 14px;background:#334155;color:white;font-weight:bold;cursor:pointer}button:hover{filter:brightness(1.15)}
+button.active{background:#6366f1}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:18px;padding:16px}.case{min-height:170px;display:flex;flex-direction:column;justify-content:space-between}
+.case h3{margin:8px 0}.muted{color:#94a3b8}.tag{display:inline-block;background:#312e81;padding:5px 8px;border-radius:8px;font-size:12px}
+.avatar{font-size:52px;text-align:center;background:#0f172a;border-radius:15px;padding:10px}
+.lock{opacity:.45}.progress{height:10px;background:#334155;border-radius:10px;overflow:hidden}.bar{height:100%;background:#818cf8;width:0}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px}.modalBox{max-width:650px;width:100%;background:#172033;border-radius:22px;padding:22px;max-height:90vh;overflow:auto}
+.clue{padding:12px;background:#0f172a;border-radius:12px;margin:8px 0;border-left:4px solid #818cf8}
+.choice{display:block;width:100%;text-align:left;margin:8px 0;background:#273449}.success{color:#86efac}.danger{color:#fca5a5}
+.small{font-size:13px}.avatarGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.avatarPick{font-size:38px;padding:14px;background:#0f172a;border:2px solid transparent}.avatarPick.selected{border-color:#818cf8}
+</style>
+
+<meta name="theme-color" content="#5b21b6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Detetive 100">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+.splash{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
+background:radial-gradient(circle at 20% 20%,#f472b6 0 14%,transparent 32%),
+radial-gradient(circle at 85% 25%,#22d3ee 0 13%,transparent 31%),
+radial-gradient(circle at 25% 85%,#facc15 0 12%,transparent 30%),
+linear-gradient(135deg,#4c1d95,#7c3aed 45%,#0ea5e9);transition:.5s}
+.splash.hide{opacity:0;pointer-events:none}.cover{width:min(88vw,470px);padding:28px;border-radius:34px;
+background:#ffffff18;border:1px solid #ffffff40;backdrop-filter:blur(14px);text-align:center;box-shadow:0 25px 80px #0006}
+.logo{font-size:82px;filter:drop-shadow(0 8px 8px #0005)}.cover h1{font-size:48px;letter-spacing:2px;text-shadow:0 5px 12px #0005}
+.cover p{font-size:17px;color:#f5f3ff}.start{background:#fff;color:#4c1d95;font-size:18px;padding:14px 28px;border-radius:16px}
+.install{display:none;background:#facc15;color:#111827;margin:0 0 14px;width:100%}
+.hero{background:linear-gradient(135deg,#581c87,#2563eb,#06b6d4);padding:20px;border-radius:22px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="splash" id="splash">
+  <div class="cover">
+    <div class="logo">🕵️‍♂️</div>
+    <h1>DETETIVE 100</h1>
+    <p>100 investigações. Centenas de pistas.<br>Você consegue descobrir todos os mistérios?</p>
+    <button class="start" onclick="enterGame()">🔎 COMEÇAR INVESTIGAÇÃO</button>
+  </div>
+</div>
+<div class="app">
+<button class="install" id="installBtn">📲 Adicionar à tela principal</button>
+<header>
+<h1>🕵️ DETETIVE 100</h1>
+<div class="sub">Você é o detetive. Resolva 100 investigações e descubra o que aconteceu.</div>
+<div class="stats">
+<div class="pill">⭐ XP: <b id="xp">0</b></div><div class="pill">🏆 Casos: <b id="done">0</b>/100</div>
+<div class="pill">💰 Moedas: <b id="coins">100</b></div><div class="pill">🔎 Nível: <b id="level">1</b></div>
+</div>
+</header>
+<div class="hero">
+  <h2 style="margin:0 0 6px">🔐 Central Secreta</h2>
+  <div>Escolha uma investigação, reúna as pistas e descubra a verdade.</div>
+</div>
+<nav>
+<button class="active" onclick="show('cases',this)">Investigações</button>
+<button onclick="show('avatar',this)">Avatares</button>
+<button onclick="show('profile',this)">Perfil</button>
+</nav>
+<section id="cases"></section>
+<section id="avatar" style="display:none"></section>
+<section id="profile" style="display:none"></section>
+</div>
+<div class="modal" id="modal"><div class="modalBox" id="modalBox"></div></div>
+
+<script>
+const avatars=[
+["🕵️","Detetive Clássico",0],["👩‍💼","Investigadora",100],["🧑‍🔬","Cientista",150],["👨‍💻","Analista",200],
+["🧑‍🎨","Observador",250],["👮","Inspetor",300],["🥸","Detetive Misterioso",400],["🤖","Detetive Robô",500]
+];
+const themes=["Museu","Escola","Parque","Biblioteca","Hotel","Praça","Estação","Teatro","Loja","Casa"];
+const templates=[
+["O objeto desaparecido","Um objeto importante sumiu. Há três pistas na cena. Qual explicação combina com todas?"],
+["A mensagem misteriosa","Uma mensagem foi deixada em um local público. Descubra o significado usando as pistas."],
+["O relógio parado","Um relógio foi encontrado parado. Compare horários, depoimentos e marcas para montar a sequência."],
+["O mapa incompleto","Um mapa possui uma parte faltando. Use símbolos e pistas para descobrir o local correto."],
+["O enigma das pegadas","Há marcas diferentes no caminho. Observe direção, tamanho e ordem para descobrir por onde alguém passou."],
+["A caixa trancada","Uma caixa tem um código. As pistas fornecem números e posições para encontrar a combinação."],
+["O depoimento estranho","Três pessoas contam versões diferentes. Encontre a única versão compatível com as pistas."],
+["A fotografia","Uma fotografia contém detalhes importantes. Observe o cenário para descobrir quando e onde foi tirada."],
+["O bilhete rasgado","Partes de um bilhete foram encontradas. Reorganize as informações e descubra a mensagem."],
+["O caso do som","Um som foi ouvido em horários diferentes. Use a sequência de eventos para identificar sua origem."]
+];
+
+let state=JSON.parse(localStorage.getItem("detetive100")||"null")||{xp:0,done:0,coins:100,avatar:0,owned:[0],completed:[]};
+let current=null;
+
+function save(){localStorage.setItem("detetive100",JSON.stringify(state));update()}
+function update(){
+document.getElementById("xp").textContent=state.xp;document.getElementById("done").textContent=state.done;
+document.getElementById("coins").textContent=state.coins;document.getElementById("level").textContent=Math.floor(state.xp/200)+1;
+}
+function show(id,btn){
+["cases","avatar","profile"].forEach(x=>document.getElementById(x).style.display=x===id?"block":"none");
+document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+if(id==="cases")renderCases();if(id==="avatar")renderAvatar();if(id==="profile")renderProfile();
+}
+function renderCases(){
+let h="<h2>📁 Central de Investigações</h2><p class='muted'>Escolha um caso. Cada investigação tem pistas e uma pergunta final.</p><div class='grid'>";
+for(let i=1;i<=100;i++){
+let locked=i>state.done+1, completed=state.completed.includes(i);
+h+=`<div class="card case ${locked?'lock':''}">
+<div><span class="tag">CASO ${String(i).padStart(3,'0')}</span><h3>${themes[(i-1)%themes.length]} — ${templates[(i-1)%templates.length][0]}</h3>
+<p class="muted small">${locked?'Complete o caso anterior para liberar.':completed?'✅ Investigação resolvida.':'🔍 Nova investigação disponível.'}</p></div>
+<button ${locked?'disabled':''} onclick="openCase(${i})">${completed?'Rever caso':'Investigar'}</button></div>`;
+}
+h+="</div>";document.getElementById("cases").innerHTML=h;
+}
+function makeCase(n){
+let t=templates[(n-1)%templates.length], place=themes[(n-1)%themes.length];
+let nums=[(n*3)%10,(n*7)%10,(n*4+1)%10];
+let correct=(n%3);
+let options=[
+"Seguir a primeira pista e ignorar as demais.",
+"Comparar todas as pistas e montar a sequência dos acontecimentos.",
+"Escolher a versão que parece mais interessante."
+];
+return {title:`Caso ${String(n).padStart(3,'0')} — ${place}`,story:t[1],
+clues:[
+`📌 Pista 1: Um detalhe do local contradiz uma conclusão apressada.`,
+`📌 Pista 2: O número ${nums[0]} aparece em um registro importante.`,
+`📌 Pista 3: A ordem dos acontecimentos passa pelo horário ${nums[1]}h.`,
+`📌 Pista 4: O número ${nums[2]} aparece em uma etiqueta ou anotação.`
+],options,correct};
+}
+function openCase(n){
+if(n>state.done+1)return;
+current=makeCase(n);
+let h=`<h2>🔎 ${current.title}</h2><p>${current.story}</p><h3>Pistas encontradas</h3>`;
+current.clues.forEach(c=>h+=`<div class="clue">${c}</div>`);
+h+=`<h3>Qual é a atitude de um bom detetive?</h3>`;
+current.options.forEach((o,i)=>h+=`<button class="choice" onclick="answer(${i})">${o}</button>`);
+h+=`<button onclick="closeModal()">Fechar</button>`;
+document.getElementById("modalBox").innerHTML=h;document.getElementById("modal").style.display="flex";
+}
+function answer(i){
+if(i===current.correct){
+let first=!state.completed.includes(current.title.match(/\\d+/)[0]*1);
+let n=parseInt(current.title.match(/\\d+/)[0]);
+if(!state.completed.includes(n)){state.completed.push(n);state.done=Math.max(state.done,n);state.xp+=100;state.coins+=50;}
+document.getElementById("modalBox").innerHTML=`<h2 class="success">✅ Caso resolvido!</h2><p>Você analisou as pistas e chegou à conclusão correta.</p><p>+100 XP &nbsp; +50 moedas</p><button onclick="closeModal();renderCases()">Próximo caso</button>`;
+save();
+}else{
+document.getElementById("modalBox").innerHTML+=`<p class="danger"><b>❌ Ainda não.</b> Releia as pistas e tente novamente.</p>`;
+}
+}
+function closeModal(){document.getElementById("modal").style.display="none"}
+function renderAvatar(){
+let h="<h2>🧑‍🎨 Escolha seu avatar</h2><div class='avatarGrid'>";
+avatars.forEach((a,i)=>{
+let owned=state.owned.includes(i),sel=state.avatar===i;
+h+=`<div class="card"><div class="avatar">${a[0]}</div><h3>${a[1]}</h3><p>${a[2]===0?'Grátis':'💰 '+a[2]+' moedas'}</p><button class="avatarPick ${sel?'selected':''}" onclick="chooseAvatar(${i})">${owned?(sel?'Equipado':'Usar'):'Comprar'}</button></div>`;
+});h+="</div>";document.getElementById("avatar").innerHTML=h;
+}
+function chooseAvatar(i){
+let a=avatars[i];
+if(!state.owned.includes(i)){if(state.coins<a[2])return alert("Moedas insuficientes!");state.coins-=a[2];state.owned.push(i)}
+state.avatar=i;save();renderAvatar();
+}
+function renderProfile(){
+let av=avatars[state.avatar];
+document.getElementById("profile").innerHTML=`<div class="card">
+<div class="avatar">${av[0]}</div><h2>${av[1]}</h2>
+<p>Investigações resolvidas: <b>${state.done}/100</b></p>
+<p>XP: <b>${state.xp}</b> • Nível: <b>${Math.floor(state.xp/200)+1}</b></p>
+<div class="progress"><div class="bar" style="width:${(state.done/100)*100}%"></div></div>
+<p class="muted">Objetivo: resolver todas as 100 investigações.</p>
+<button onclick="resetGame()">Reiniciar progresso</button>
+</div>`;
+}
+function resetGame(){if(confirm("Reiniciar todo o progresso?")){localStorage.removeItem("detetive100");location.reload()}}
+update();renderCases();
+
+function enterGame(){
+  document.getElementById("splash").classList.add("hide");
+}
+setTimeout(()=>document.getElementById("splash").classList.add("hide"),3500);
+
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); deferredPrompt=e;
+  document.getElementById("installBtn").style.display="block";
+});
+document.getElementById("installBtn").onclick=async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  document.getElementById("installBtn").style.display="none";
+};
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+</script>
+</body></html>
